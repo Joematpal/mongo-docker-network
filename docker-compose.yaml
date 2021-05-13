@@ -7,10 +7,8 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=database
     volumes:
-      - ./image-builder/files/escape-pod-ui/dist:/usr/local/escapepod/ui
-      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-      - ./deepspeech:/deepspeech
       - data:/data/db
     expose:
       - "27017"

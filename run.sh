@@ -1,4 +1,4 @@
-DB_HOST=127.0.0.1 \
+DB_HOST=localhost \
 DB_PORT=27017 \
 DB_NAME=database \
 DB_USERNAME=root \
