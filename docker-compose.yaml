@@ -1,0 +1,41 @@
+version: '3.7'
+services:
+  escapepod-mongo:
+    container_name: escapepod-mongo
+    image: mongo:4.4.1-bionic
+    command: mongod --oplogSize 128 --replSet rs0 --storageEngine=wiredTiger
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - ./image-builder/files/escape-pod-ui/dist:/usr/local/escapepod/ui
+      - ./scripts/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ./deepspeech:/deepspeech
+      - data:/data/db
+    expose:
+      - "27017"
+    ports:
+      - "27017:27017"
+  escapepod-test:
+    container_name: escapepod-test
+    build:
+      context: .
+      args:
+        - GITHUB_USER=${GITHUB_USER}
+        - GITHUB_TOKEN=${GITHUB_TOKEN}
+    environment: 
+      - DB_HOST=escapepod-mongo
+      - DB_PORT=27017
+      - DB_NAME=database
+      - DB_USERNAME=root
+      - DB_PASSWORD=password
+    expose:
+      - "8084"
+      - "8085"
+    ports:
+      - "8084:8084"
+      - "8085:8085"
+    depends_on:
+      - escapepod-mongo
+volumes:
+  data: 
