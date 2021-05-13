@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"time"
 
 	cli "github.com/urfave/cli/v2"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -44,10 +45,8 @@ func NewApp() *cli.App {
 		},
 		Action: func(c *cli.Context) error {
 			uri := fmt.Sprintf(
-				"%s://%s:%s@%s:%s",
+				"%s://%s:%s/?connect=direct",
 				"mongodb",
-				c.String("db-username"),
-				c.String("db-password"),
 				c.String("db-host"),
 				c.String("db-port"),
 			)
@@ -57,9 +56,14 @@ func NewApp() *cli.App {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
-			opts := options.Client().
-				ApplyURI(uri)
+			credential := options.Credential{
+				Username: c.String("db-username"),
+				Password: c.String("db-password"),
+			}
 
+			opts := options.Client().
+				ApplyURI(uri).
+				SetAuth(credential)
 			client, err := mongo.Connect(ctx, opts)
 			if err != nil {
 				return err
@@ -73,7 +77,7 @@ func NewApp() *cli.App {
 
 			// db := client.Database(c.String("db-name"))
 
-			ctx, cancel = context.WithCancel(context.Background())
+			ctx, cancel = context.WithTimeout(context.Background(), 30*time.Second)
 			defer cancel()
 
 			if err := client.Ping(ctx, readpref.Primary()); err != nil {

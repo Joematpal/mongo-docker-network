@@ -3,11 +3,10 @@ services:
   escapepod-mongo:
     container_name: escapepod-mongo
     image: mongo:4.4.1-bionic
-    command: mongod --oplogSize 128 --replSet rs0 --storageEngine=wiredTiger
+    # command: mongod --oplogSize 128 --storageEngine=wiredTiger
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=password
-      - MONGO_INITDB_DATABASE=database
     volumes:
       - data:/data/db
     expose:
